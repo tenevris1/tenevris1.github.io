@@ -2,7 +2,7 @@
 //WARNING! tvS requires p5.js, p5.play, p5.sound, and planck.js to work. If you don't have them, tvS will not work.
 //feel free to edit any settings below!
 
-moveMode = "vel" //"vel" or "pos". 'vel' is acceleration, 'pos' is just moving.
+moveMode = "pos" //"vel" or "pos". 'vel' is acceleration, 'pos' is just moving.
 speedName = "Speed" //name of the speed variable.
 
 //don't edit anything below this text. It might break.
@@ -14,25 +14,25 @@ function init_tvS(is) {
     console.info("You can put 'init_tvS(true)' to skip this message, and initialize tvS.");
     console.info("tvS is a library that makes p5.js easier for beginners, and reduces work, even for advanced coders.");
     console.info("tvS, or tenevrisScript, is a JavaScript library made by Tenevris.");
-    console.info("Check out the documentation at https://tenevris/tvS.com!");
-    if (typeof Sprite == 'undefined')  {
+    console.info("Check out the documentation at https://github.com/tenevris1/tenevris1.github.io/wiki! Sorry the link is long, but I'm poor, and can't afford a custom domain.");
+    if (typeof Sprite == 'undefined') {
       console.warn("You must run the following scripts in your html file to use tvS:")
-    console.info('<script src="https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/p5.js"></script>');
-    console.info('<script src="https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/addons/p5.sound.min.js"></script>');
-    console.info('<script src="https://p5play.org/v3/planck.min.js"></script>');
-    console.info('<script src="https://p5play.org/v3/p5play.js"></script>');
-    console.warn("Alternatively, if you have those, you must put init_tvs() in the setup function. I have no idea why this is needed, but it is.");
+      console.info('<script src="https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/p5.js"></script>');
+      console.info('<script src="https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/addons/p5.sound.min.js"></script>');
+      console.info('<script src="https://p5play.org/v3/planck.min.js"></script>');
+      console.info('<script src="https://p5play.org/v3/p5play.js"></script>');
+      console.warn("Alternatively, if you have those, you must put init_tvS() in the setup function. I have no idea why this is needed, but it is.");
     } else {
       console.log("tvS can do many things, such as:");
       console.log("Make sprites easily, with makeSprite(),");
       console.log("Move sprites easily, with moveUp(), moveDown(), moveLeft(), moveRight(), and move(),");
       console.log("Play music and sounds easily, with music() and sound(),");
       console.log("And even run scripts for almost anything, with run()!");
+      console.log();
     }
-    console.log();
   } else {
     load_tvS();
-  } 
+  }
 }
 
 function load_tvS() {
@@ -40,10 +40,8 @@ function load_tvS() {
   console.log("tvS: init_Move loaded");
   init_Sprites();
   console.log("tvS: init_Sprites loaded.");
-  init_buttons();
-  console.log("tvS: init_buttons loaded.");
-  init_sound();
-  console.log("tvS: init_sound loaded.");
+  init_Misc();
+  console.log("tvS: init_Misc loaded.");
   console.log("tvS: tvS fully initialized.");
 }
 
@@ -87,15 +85,15 @@ function init_Move() {
   Sprite.prototype.move = function(type, key) {
     if (isPress(key) || key == undefined) {
       if (moveMode == "vel") {
-        if (type == "up" || type == "Up") {this.vel.y -= this[speedName];}
-        if (type == "down" || type == "Down") {this.vel.y += this[speedName];}
-        if (type == "left" || type == "Left") {this.vel.x -= this[speedName];}
-        if (type == "right" || type == "Right") {this.vel.x += this[speedName];}
+        if (type == "up" || type == "Up") { this.vel.y -= this[speedName]; }
+        if (type == "down" || type == "Down") { this.vel.y += this[speedName]; }
+        if (type == "left" || type == "Left") { this.vel.x -= this[speedName]; }
+        if (type == "right" || type == "Right") { this.vel.x += this[speedName]; }
       } else if (moveMode == "pos") {
-        if (type == "up" || type == "Up") {this.y -= this[speedName];}
-        if (type == "down" || type == "Down") {this.y += this[speedName];}
-        if (type == "left" || type == "Left") {this.x -= this[speedName];}
-        if (type == "right" || type == "Right") {this.x += this[speedName];}
+        if (type == "up" || type == "Up") { this.y -= this[speedName]; }
+        if (type == "down" || type == "Down") { this.y += this[speedName]; }
+        if (type == "left" || type == "Left") { this.x -= this[speedName]; }
+        if (type == "right" || type == "Right") { this.x += this[speedName]; }
       }
     }
   }
@@ -116,7 +114,7 @@ function init_Move() {
 }
 
 function init_Sprites() {
-  makeSprite = function(name, img, x, y, collide, group) {
+  makeSprite = function(img, x, y, collide, group) {
     let newSprite = new Sprite();
     newSprite.scale = 1;
     newSprite.vel.y = 0;
@@ -134,12 +132,11 @@ function init_Sprites() {
     }
     newSprite.mass = 1;
     newSprite.img = img;
-    return(newSprite);
+    return (newSprite);
   }
   Array.prototype.run = function(code) {
-    for (i = this.length - 1; i >= 0; i--) {
+    for (var i = this.length - 1; i >= 0; i--;) {
       let sprite = this[i];
-      code(sprite);
       if (code(sprite) == 'remove') {
         sprite.remove();
         this.splice(i, 1);
@@ -147,7 +144,9 @@ function init_Sprites() {
     }
   }
   Sprite.prototype.run = function(code) {
-    code(this);
+    if (code(this) == 'remove') {
+      this.remove();
+    }
   }
   distance = function(x1, y1, x2, y2) {
     let dx = x2 - x1;
@@ -155,9 +154,9 @@ function init_Sprites() {
     let distance = Math.sqrt(dx * dx + dy * dy);
     return distance;
   }
-}
+};
 
-function init_buttons() {
+function init_Misc() {
   isPress = function(key) {
     if (key == "Mouse") {
       if (mouse.pressing()) {
@@ -173,17 +172,11 @@ function init_buttons() {
       }
     }
   }
-}
-
-function init_sound() {
-  music = function(noise, loop) {
+  play = function(noise, loop) {
     if (loop) {
       noise.loop();
     } else {
       noise.play();
     }
   }
-  sound = function(noise) {
-    noise.play();
-  }
-}
+};
