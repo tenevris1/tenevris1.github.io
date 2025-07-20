@@ -1,64 +1,55 @@
-// tvS.js file
-//WARNING! tvS requires p5.js, p5.play, p5.sound, and planck.js to work. If you don't have them, tvS will not work.
-//feel free to edit any settings below!
-
-moveMode = "vel" //"vel" or "pos". 'vel' is acceleration, 'pos' is just moving.
-speedName = "Speed" //name of the speed variable.
-screenSize = [800, 600]
-//don't edit anything below this text. It might break.
-
-let all = new Array();
-
-console.log("If you haven't already, call init_tvS() in your code.");
-console.log("This is tvS 0.3.3");
-function init_tvS(is) {
-  if (!is) {
-    console.info("Welcome to tvS! Expand the console to have a full introduction.");
-    console.info("You can put 'init_tvS(true)' to skip this message, and initialize tvS.");
-    console.info("tvS is a library that makes p5.js easier for beginners, and reduces work, even for advanced coders.");
-    console.info("tvS, or tenevrisScript, is a JavaScript library made by Tenevris.");
-    console.info("Check out the documentation at https://github.com/tenevris1/tenevris1.github.io/wiki! Sorry the link is long, but I'm poor, and can't afford a custom domain.");
-    if (typeof Sprite == 'undefined' || typeof createCanvas == 'undefined' || typeof p5.SoundFile == 'undefined' || typeof loadSound == 'undefined') {
-    if (typeof Sprite == 'undefined') {
-      console.warn("p5.play.js not loaded. Please include: <script src=\"https://p5play.org/v3/p5play.js\"></script>");
-    }
-    if (typeof createCanvas == 'undefined') {
-      console.warn("p5.js not loaded. Please include: <script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/p5.js\"></script>");
-    }
-    if (typeof p5.SoundFile == 'undefined' && typeof loadSound == 'undefined') {
-      console.warn("p5.sound.min.js not loaded. Please include: <script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/addons/p5.sound.min.js\"></script>");
-    }
-    if (typeof planck == 'undefined') {
-      console.warn("planck.min.js not loaded. Please include: <script src=\"https://p5play.org/v3/planck.min.js\"></script>");
-    }
-      console.warn("Alternatively, if you have those, you must put init_tvS() in the setup function. I have no idea why this is needed, but it is.");
-    } else {
-      console.log("tvS can do many things, such as:");
-      console.log("Make sprites easily, with makeSprite(),");
-      console.log("Move sprites easily, with moveUp(), moveDown(), moveLeft(), moveRight(), and move(),");
-      console.log("Play music and sounds easily, with play(),");
-      console.log("And even run scripts for almost anything, with run()!");
-      console.log();
-    }
-  } else {
-    load_tvS();
-  }
+function loadScript(url) {
+  const script = document.createElement('script');
+  script.src = url;
+  script.onload = () => {
+    console.log(`${url} loaded successfully!`);
+  };
+  script.onerror = () => {
+    console.error(`Error loading ${url}`);
+  };
+  document.body.appendChild(script);
 }
 
+loadScript('https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/p5.min.js');
+loadScript('https://p5play.org/v3/planck.min.js')
+loadScript('https://p5play.org/v3/p5play.js')
+loadScript('https://cdn.jsdelivr.net/npm/p5@1.11.4/lib/addons/p5.sound.min.js')
+
+moveMode = "vel" //"vel" or "pos". 'vel' is acceleration, 'pos' is just moving.
+speedName = "spd" //name of the speed variable.
+
+//don't edit anything below this text. It might break.
+let all = new Array();
+let menus = new Array();
+let undef = undefined;
+
+
+console.log("Welcome to tvS 0.3.5!")
 function load_tvS() {
-  create_enviroment();
-  console.log("tvS: enviroment made.");
   init_Move();
   console.log("tvS: init_Move loaded");
   init_Sprites();
   console.log("tvS: init_Sprites loaded.");
   init_Misc();
   console.log("tvS: init_Misc loaded.");
+  init_Menu();
+  console.log("tvS: init_Menu loaded.");
+  create_enviroment();
+  console.log("tvS: enviroment made.");
   console.log("tvS: tvS fully initialized.");
 }
 
 function create_enviroment() {
-  createCanvas(screenSize[0], screenSize[1]);
+  mouse = makeSprite(undef, mouseX, mouseY);
+  if (mouseIsPressing) {
+    mouse.pressing = function() {
+      return true;
+    }
+  } else {
+    mouse.pressing = function() {
+      return false;
+    }
+  }
 }
 
 function init_Move() {
@@ -160,10 +151,13 @@ function init_Sprites() {
     newSprite.physics = "dynamic";
     newSprite.collider = "none";
     newSprite.mass = 1;
-    newSprite.img = img;
     if (img) {
+      newSprite.img = img;
       newSprite.width = img.width;
       newSprite.height = img.height;
+    } else {
+      newSprite.width = 5;
+      newSprite.height = 5;
     }
     return (newSprite);
   }
@@ -268,13 +262,62 @@ function init_Misc() {
   }
 };
 
+function init_Menu() {
+  createMenu = function() {
+    newMenu = new Array();
+    menus.push(newMenu)
+    newMenu.vis = true;
+    return newMenu
+  }
+  addButton = function(image, x, y, menu, code) {
+    let button = makeSprite(image, x, y, menu)
+    button.pCode = code;
+    return button;
+  }
+  Array.prototype.hide = function() {
+    this.vis = false;
+  }
+  Array.prototype.show = function() {
+    this.vis = true;
+  }
+}
+
+
 function preload() {
+  
 }
 
 function setup() {
+  load_tvS()
 }
 
 function draw() {
+  mouse.x = mouseX;
+  mouse.y = mouseY;
+  if (mouseIsPressing) {
+    mouse.pressing = function() {
+      return true;
+    }
+  } else {
+    mouse.pressing = function() {
+      return false;
+    }
+  }
+  for (var i = menus.length - 1; i >= 0; i--) {
+    if (menus[i].vis == true) {
+      menus[i].run(sprite => {
+        sprite.visible = true;
+        if (isPress('mouse') && sprite.hit(mouse)) {
+          sprite.pCode();
+        }
+      });
+    } else {
+      menus[i].run(sprite => {
+        sprite.visible = false;
+      });
+    }
+  }
 }
+
 
 //end of tvS.js
