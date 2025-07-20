@@ -40,16 +40,7 @@ function load_tvS() {
 }
 
 function create_enviroment() {
-  mouse = makeSprite(undef, mouseX, mouseY);
-  if (mouseIsPressing) {
-    mouse.pressing = function() {
-      return true;
-    }
-  } else {
-    mouse.pressing = function() {
-      return false;
-    }
-  }
+  
 }
 
 function init_Move() {
@@ -288,7 +279,6 @@ function preload() {
 }
 
 function setup() {
-  load_tvS()
 }
 
 function draw() {
