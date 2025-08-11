@@ -1,4 +1,5 @@
 let COLOR = "black";
+let circles = []
 let frame = 0;
 var Z = document.createElement("canvas");
 Z.width = window.innerWidth;
@@ -27,6 +28,7 @@ function rect(x, y, w, h) {
   ctx.fillStyle = COLOR;
   ctx.fill();
 }
+
 function text(text, x, y, fontSize, font, link, link2) {
   var TXT = text;
   var X = x;
@@ -45,7 +47,12 @@ function text(text, x, y, fontSize, font, link, link2) {
   if (link) {
     ctx.fillStyle = "blue";
   } else {
-    ctx.fillStyle = "white";
+    CSB(
+      70,
+      10,
+      70
+    );
+    ctx.fillStyle = COLOR;
   }
   ctx.fillText(TXT, X - textMetrics.width / 2, Y);
   if (link && link2 == true) {
@@ -61,6 +68,7 @@ function text(text, x, y, fontSize, font, link, link2) {
     clickables.push(temp);
   }
 }
+
 Z.addEventListener("click", function (event) {
   var rect = Z.getBoundingClientRect();
   var mouseX = event.clientX - rect.left;
@@ -99,10 +107,92 @@ function createBars(total) {
   }
 }
 
+function circle(x, y, size, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+function HSL(H, S, L) {
+  COLOR = `hsl(${H} ${S}% ${L}%)`;
+}
+
+function CSB(C, S, B) {
+  let H = C * 3.6;
+  let L = B / 2;
+  HSL(H, S, L);
+}
+
+
+function createCircle(num, Dist, speed, spawn) {
+    CSB(
+        Math.random() * 10 + 45,
+        Math.random() * 10 + 90,
+        Math.random() * 25 + 50
+    );
+    let Xi = [Z.width / 2]
+    let Yi = [0]
+    for (let i = 0; i < 20; i++) {
+        Xi.push(0);
+        Yi.push(0)
+    }
+
+    let angleOffset = 0;
+    if (spawn) {
+        angleOffset = Math.PI;
+    }
+
+    circles.push({
+        dist: Dist * 40,
+        spd: speed * (Math.random() / 2 + 0.5),
+        color: COLOR,
+        frame: 0,
+        x: Xi,
+        angleOffset: angleOffset,
+        y: Yi,
+        size: 10
+    });
+}
+
+function drawOf(list) {
+    let centerX = Z.width / 2;
+    let centerY = 0;
+
+    for (let circ of list) {
+        circ.frame++;
+        
+        let angle = (circ.spd * circ.frame) + circ.angleOffset;
+
+        let newX = centerX + circ.dist * Math.cos(angle);
+        let newY = centerY + circ.dist * Math.sin(angle);
+
+        circ.x.unshift(newX);
+        circ.y.unshift(newY);
+        circ.x.pop();
+        circ.y.pop();
+
+        let size = circ.size;
+        for (let num = 0; num < circ.x.length; num++) {
+            let currentSize = size - (size / circ.x.length) * num;
+            if (currentSize > 0) {
+                circle(circ.x[num], circ.y[num], currentSize, circ.color);
+            }
+        }
+    }
+}
+
 function draw() {
   CSB(74, 100, 15);
   rect(0, 0, Z.width, Z.height);
-  text(
+  for (let i of list) {
+    i.f += i.fp;
+    COLOR = i.c;
+    let y = i.y - Math.cos(i.f) * i.spd;
+    rect(i.x, y, i.w, i.h);
+  }
+  drawOf(circles)
+    text(
     "- Eternity Refreshed -",
     Z.width / 2,
     50,
@@ -120,23 +210,15 @@ function draw() {
     true,
     false
   );
-  for (let i of list) {
-    i.f += i.fp;
-    COLOR = i.c;
-    let y = i.y - Math.cos(i.f) * i.spd;
-    rect(i.x, y, i.w, i.h);
+  requestAnimationFrame(draw)
+}
+
+let speed = 0.03 * (Math.random() / 2 + 0.5);
+for (let i = 0; i <= 8; i++) {
+  createCircle(i, Math.floor(i / 2) + 5, speed, i % 2)
+  if (i % 2 == 0) {
+    speed = 0.03 * (Math.random() / 2 + 0.5);
   }
-  setTimeout(draw, 10);
-}
-
-function HSL(H, S, L) {
-  COLOR = `hsl(${H} ${S}% ${L}%)`;
-}
-
-function CSB(C, S, B) {
-  let H = C * 3.6;
-  let L = B / 2;
-  HSL(H, S, L);
 }
 
 createBars(Math.floor(Z.width / 30));
