@@ -103,7 +103,7 @@ function draw() {
   CSB(74, 100, 15);
   rect(0, 0, Z.width, Z.height);
   text(
-    "Eternity Refreshed",
+    - - "Eternity Refreshed - -",
     Z.width / 2,
     50,
     "26px",
