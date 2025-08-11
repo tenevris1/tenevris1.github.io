@@ -70,7 +70,7 @@ Z.addEventListener("click", function (event) {
     window.open(clicked.link, "_self");
   }
 });
-text("Eternity Remastered", Z.width / 2, 50, "26px", "Fira Sans", false, false);
+text("Eternity Refreshed", Z.width / 2, 50, "26px", "Fira Sans", false, false);
 text("https://discord.gg/TJyxhNZHND", Z.width / 2, 100, null, null, true, true);
 
 let list = [];
